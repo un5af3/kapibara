@@ -1,0 +1,29 @@
+[package]
+name = "kapibara"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["crates/kapibara-service", "crates/kapibara-transport"]
+
+[dependencies]
+clap = { version = "4.5.16", features = ["derive"] }
+env_logger = "0.11.5"
+kapibara-service = { path = "crates/kapibara-service"}
+kapibara-transport = { path = "crates/kapibara-transport" }
+log = "0.4.22"
+pin-project = "1.1.5"
+serde = { version = "1.0.208", features = ["derive"] }
+serde_json = "1.0.125"
+serde_yaml = "0.9.34"
+thiserror = "1.0.63"
+tokio = { version = "1.39.3", features = ["full"] }
+trait-variant = "0.1.2"
+
+[[bin]]
+name = "kapibara"
+path = "bin/kapibara.rs"
+
+[[bin]]
+name = "showopt"
+path = "bin/showopt.rs"

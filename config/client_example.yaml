@@ -1,0 +1,26 @@
+route:
+  rules:
+    - dns: false
+      inbound:
+        - in-1
+      outbound: out-1
+inbound:
+  - tag: in-1
+    server:
+      opt: !tcp
+        listen: 127.0.0.1:6868
+        tcp_nodelay: true
+    service: !socks
+outbound:
+  - tag: out-1
+    client:
+      opt: !ws
+        addr: 127.0.0.1
+        port: 8686
+        path: /test
+        tcp_nodelay: true
+      tls:
+        insecure: true
+        enable_sni: false
+    service: !vless
+      uuid: b1eb0b94-8f57-438b-97d5-e79090cc5108

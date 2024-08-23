@@ -1,0 +1,76 @@
+dns:
+  strategy: ipv4_then_ipv6
+  timeout:
+    secs: 5
+    nanos: 0
+  servers:
+    - protocol: Udp
+      address: 8.8.8.8:53
+route:
+  rules:
+    - dns: false
+      inbound:
+        - in-1
+      outbound: out-1
+    - dns: true
+      inbound:
+        - in-2
+      outbound: out-2
+inbound:
+  - tag: in-1
+    server:
+      opt: !tcp
+        listen: 127.0.0.1:6868
+        tcp_nodelay: true
+      tls: null
+    service: !socks
+      auth:
+        - !username
+          user: test
+          pass: test
+  - tag: in-2
+    server:
+      opt: !ws
+        listen: 127.0.0.1:6868
+        path: /test
+        tcp_nodelay: true
+      tls:
+        alpn:
+          - http/1.1
+          - http/2
+        certificate: !file
+          cert: certs/test.crt
+          key: certs/test.key
+    service: !vless
+      users:
+        - user: test
+          uuid: b1eb0b94-8f57-438b-97d5-e79090cc5108
+outbound:
+  - tag: out-1
+    client:
+      opt: !ws
+        addr: test.com
+        port: 443
+        path: /test
+        tcp_nodelay: true
+      tls:
+        insecure: false
+        alpn:
+          - http/1.1
+          - http/2
+        enable_sni: true
+        server_name: test.com
+    service: !vless
+      uuid: b1eb0b94-8f57-438b-97d5-e79090cc5108
+      flow: null
+    timeout:
+      secs: 30
+      nanos: 0
+  - tag: out-2
+    client:
+      opt: empty
+      tls: null
+    service: direct
+    timeout:
+      secs: 30
+      nanos: 0

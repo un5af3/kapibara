@@ -1,0 +1,35 @@
+dns:
+  strategy: ipv4_then_ipv6
+  timeout:
+    secs: 5
+    nanos: 0
+  servers:
+    - protocol: udp
+      address: 8.8.8.8:53
+route:
+  rules:
+    - dns: true
+      inbound:
+        - in-2
+      outbound: out-2
+inbound:
+  - tag: in-2
+    server:
+      opt: !ws
+        listen: 127.0.0.1:8686
+        path: /test
+        tcp_nodelay: true
+      tls:
+        certificate: !file
+          cert: certs/test.crt
+          key: certs/test.key
+    service: !vless
+      users:
+        - user: test
+          uuid: b1eb0b94-8f57-438b-97d5-e79090cc5108
+outbound:
+  - tag: out-2
+    service: direct
+    timeout:
+      secs: 30
+      nanos: 0
