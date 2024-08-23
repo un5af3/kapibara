@@ -1,0 +1,6 @@
+[submodule "crates/kapibara-transport"]
+	path = crates/kapibara-transport
+	url = git@github.com:un5af3/kapibara-transport.git
+[submodule "crates/kapibara-service"]
+	path = crates/kapibara-service
+	url = git@github.com:un5af3/kapibara-service.git
