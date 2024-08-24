@@ -250,11 +250,7 @@ impl TransportServerCallback for DispatchCallback {
                 match tokio::io::copy_bidirectional(&mut in_stream, &mut out_stream).await {
                     Ok(s) => s,
                     Err(e) => {
-                        if e.kind() != std::io::ErrorKind::TimedOut {
-                            log::warn!("[transport] {}", e);
-                        } else {
-                            log::debug!("[transport] {}", e);
-                        }
+                        log::debug!("[transport] {}", e);
                         return;
                     }
                 };
@@ -273,11 +269,7 @@ impl TransportServerCallback for DispatchCallback {
                 match tokio::io::copy_bidirectional(&mut in_stream, &mut out_stream).await {
                     Ok(s) => s,
                     Err(e) => {
-                        if e.kind() != std::io::ErrorKind::TimedOut {
-                            log::warn!("[transport] {}", e);
-                        } else {
-                            log::debug!("[transport] {}", e);
-                        }
+                        log::debug!("[transport] {}", e);
                         return;
                     }
                 };
