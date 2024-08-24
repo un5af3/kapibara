@@ -13,8 +13,10 @@ use serde::{Deserialize, Serialize};
 use tokio::task::JoinHandle;
 
 use crate::{
-    dns::Dns, error::OptionError, stream::ToStreamTimer, DispatchError, DnsOption, Inbound,
-    InboundOption, Outbound, OutboundOption, Route, RouteOption,
+    dns::Dns,
+    error::OptionError,
+    io::{copy_bi, ToStreamTimer},
+    DispatchError, DnsOption, Inbound, InboundOption, Outbound, OutboundOption, Route, RouteOption,
 };
 
 const SERVER_RETRY: u8 = 30;
@@ -246,14 +248,13 @@ impl TransportServerCallback for DispatchCallback {
                 }
             };
 
-            let (_tx, _rx) =
-                match tokio::io::copy_bidirectional(&mut in_stream, &mut out_stream).await {
-                    Ok(s) => s,
-                    Err(e) => {
-                        log::debug!("[transport] {}", e);
-                        return;
-                    }
-                };
+            let (_tx, _rx) = match copy_bi(&mut in_stream, &mut out_stream).await {
+                Ok(s) => s,
+                Err(e) => {
+                    log::debug!("[transport] {}", e);
+                    return;
+                }
+            };
         } else {
             let cli_stream = cli_stream.to_timer(self.timeout);
 
@@ -265,14 +266,13 @@ impl TransportServerCallback for DispatchCallback {
                 }
             };
 
-            let (_tx, _rx) =
-                match tokio::io::copy_bidirectional(&mut in_stream, &mut out_stream).await {
-                    Ok(s) => s,
-                    Err(e) => {
-                        log::debug!("[transport] {}", e);
-                        return;
-                    }
-                };
+            let (_tx, _rx) = match copy_bi(&mut in_stream, &mut out_stream).await {
+                Ok(s) => s,
+                Err(e) => {
+                    log::debug!("[transport] {}", e);
+                    return;
+                }
+            };
         }
     }
 }

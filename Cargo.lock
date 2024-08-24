@@ -890,6 +890,7 @@ dependencies = [
  "anyhow",
  "clap",
  "env_logger",
+ "futures-util",
  "kapibara-service",
  "kapibara-transport",
  "log",

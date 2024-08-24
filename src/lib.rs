@@ -17,8 +17,7 @@ pub use route::{Route, RouteOption, RouteRule, RouteRuleOption};
 pub mod dns;
 pub use dns::DnsOption;
 
-pub mod stream;
-pub use stream::StreamTimer;
-
 pub mod codec;
 pub use codec::Codec;
+
+pub mod io;

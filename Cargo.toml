@@ -10,6 +10,7 @@ members = ["crates/kapibara-service", "crates/kapibara-transport"]
 anyhow = "1.0.86"
 clap = { version = "4.5.16", features = ["derive"] }
 env_logger = "0.11.5"
+futures-util = { version = "0.3.30" }
 kapibara-service = { path = "crates/kapibara-service"}
 kapibara-transport = { path = "crates/kapibara-transport" }
 log = "0.4.22"
