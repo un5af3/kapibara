@@ -40,6 +40,11 @@ enum Commands {
 enum Generate {
     /// generate uuid
     Uuid,
+    /// generate self signed
+    Cert {
+        #[arg(short, long, value_delimiter = ',')]
+        domain: Vec<String>,
+    },
 }
 
 fn init_logger(level: LogLevel) {
@@ -70,6 +75,11 @@ async fn main() {
                 let uuid = uuid::Uuid::new_v4();
                 println!("{}", uuid);
             }
+            Generate::Cert { domain } => {
+                if let Err(err) = gen_cert(domain).await {
+                    log::error!("[main::gen::cert] {}", err);
+                }
+            }
         },
     }
 }
@@ -93,6 +103,15 @@ async fn test(config: PathBuf) -> Result<()> {
     let pretty_str = serde_json::to_string_pretty(&opt)?;
 
     println!("{}", pretty_str);
+
+    Ok(())
+}
+
+async fn gen_cert(domain: Vec<String>) -> Result<()> {
+    let rcgen::CertifiedKey { cert, key_pair } = rcgen::generate_simple_self_signed(domain)?;
+
+    println!("{}", cert.pem());
+    println!("{}", key_pair.serialize_pem());
 
     Ok(())
 }
