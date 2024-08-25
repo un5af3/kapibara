@@ -10,7 +10,7 @@ use kapibara_transport::{
     Resolver, TransportClient, TransportClientTrait, TransportServerCallback, TransportServerTrait,
 };
 use serde::{Deserialize, Serialize};
-use tokio::task::JoinHandle;
+use tokio::{io::BufStream, task::JoinHandle};
 
 use crate::{
     dns::Dns,
@@ -173,6 +173,7 @@ impl TransportServerCallback for DispatchCallback {
     where
         S: tokio::io::AsyncRead + tokio::io::AsyncWrite + Unpin + Send + Sync,
     {
+        let stream = BufStream::new(stream);
         let (mut in_stream, in_pac) = match self.in_svc.handshake(stream).await {
             Ok((s, p)) => (s, p),
             Err(e) => {
@@ -240,13 +241,15 @@ impl TransportServerCallback for DispatchCallback {
         // if cli_stream is empty, so the timer need to set after handshake
         // else cli_stream need to set timer first, because handshake need.
         if cli_stream.is_emtpy() {
-            let mut out_stream = match self.out_svc.handshake(cli_stream, out_pac).await {
+            let out_stream = match self.out_svc.handshake(cli_stream, out_pac).await {
                 Ok(s) => s.to_timer(self.timeout),
                 Err(e) => {
                     log::debug!("[outbound] {}", e);
                     return;
                 }
             };
+
+            let mut out_stream = BufStream::new(out_stream);
 
             let (_tx, _rx) = match copy_bi(&mut in_stream, &mut out_stream).await {
                 Ok(s) => s,
@@ -256,7 +259,7 @@ impl TransportServerCallback for DispatchCallback {
                 }
             };
         } else {
-            let cli_stream = cli_stream.to_timer(self.timeout);
+            let cli_stream = BufStream::new(cli_stream.to_timer(self.timeout));
 
             let mut out_stream = match self.out_svc.handshake(cli_stream, out_pac).await {
                 Ok(s) => s,
