@@ -5,7 +5,7 @@ use std::{
     time::Duration,
 };
 
-use pin_project::pin_project;
+use pin_project_lite::pin_project;
 use tokio::{
     io::{AsyncRead, AsyncWrite, ReadBuf},
     time,
@@ -13,13 +13,14 @@ use tokio::{
 
 use super::StreamTrait;
 
-#[pin_project]
-pub struct StreamTimer<S: StreamTrait> {
-    #[pin]
-    inner: S,
-    timeout: Option<Duration>,
-    #[pin]
-    timer: Option<Pin<Box<time::Sleep>>>,
+pin_project! {
+    pub struct StreamTimer<S: StreamTrait> {
+        #[pin]
+        inner: S,
+        timeout: Option<Duration>,
+        #[pin]
+        timer: Option<Pin<Box<time::Sleep>>>,
+    }
 }
 
 impl<S: StreamTrait> StreamTimer<S> {
